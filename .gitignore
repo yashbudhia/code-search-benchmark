@@ -67,6 +67,10 @@ test_gold_set*.json
 .env
 .env.local
 
+# API test files with keys
+test-api-latency.ps1
+test-api-*.ps1
+
 # Temporary files
 *.tmp
 *.bak
