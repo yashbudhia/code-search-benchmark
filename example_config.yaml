@@ -1,0 +1,46 @@
+# Example Benchmark Configuration
+# Copy this file and customize for your needs
+
+dataset:
+  # Path to the Git repository to analyze
+  repository_path: /path/to/your/repo
+  
+  # File patterns to exclude from test cases
+  exclude_patterns:
+    - "*.md"           # Markdown files
+    - "*.json"         # JSON config files
+    - "*.yaml"         # YAML config files
+    - "test_*"         # Test files
+    - "docs/*"         # Documentation
+    - "*.lock"         # Lock files
+  
+  # Commit filtering
+  min_files: 2         # Minimum files modified to include commit
+  max_files: 20        # Maximum files modified to include commit
+  include_merge_commits: false
+
+evaluation:
+  num_runs: 3          # Number of times to run each query
+  timeout_seconds: 30  # Timeout per query
+  randomize_order: true  # Randomize test case order
+
+agents:
+  # Keyword search baseline
+  - name: keyword_search
+    class: KeywordSearchAgent
+    config:
+      case_sensitive: false
+  
+  # Add your custom agents here
+  # - name: my_agent
+  #   class: MyCustomAgent
+  #   config:
+  #     param1: value1
+
+output:
+  directory: ./benchmark_results
+  formats:
+    - json
+    - csv
+    - markdown
+  generate_visualizations: true
