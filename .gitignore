@@ -55,10 +55,15 @@ htmlcov/
 # Benchmark outputs
 benchmark_results/
 results/
+test_results/
 *.json
 !example_config.yaml
 gold_set*.json
 test_gold_set*.json
+
+# Test repositories
+test-repo/
+test_*/
 
 # Logs
 *.log

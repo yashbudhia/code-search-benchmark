@@ -56,13 +56,19 @@ def main():
     multiple=True,
     help="File patterns to exclude (can be specified multiple times)"
 )
+@click.option(
+    "--max-commits",
+    type=int,
+    help="Maximum number of commits to analyze (optional, analyzes all if not specified)"
+)
 def generate(
     repo: str,
     output: str,
     config: Optional[str],
     min_files: int,
     max_files: int,
-    exclude_pattern: tuple
+    exclude_pattern: tuple,
+    max_commits: Optional[int]
 ):
     """Generate a gold set dataset from Git repository history.
     
@@ -81,7 +87,11 @@ def generate(
     
     try:
         # Generate dataset
-        generator = DatasetGenerator(repo, filter_config)
+        generator = DatasetGenerator(repo, filter_config, max_commits=max_commits)
+        
+        if max_commits:
+            click.echo(f"Analyzing up to {max_commits} most recent commits...")
+        
         gold_set = generator.generate_gold_set()
         
         # Save to file
@@ -186,8 +196,8 @@ def evaluate(
         
         # Run evaluation
         click.echo(f"Running evaluation (num_runs={num_runs}, timeout={timeout}s)...")
-        engine = EvaluationEngine(gold_set_obj, retrieval_agent)
-        eval_results = engine.run_evaluation(num_runs=num_runs, timeout=timeout)
+        engine = EvaluationEngine(gold_set_obj, retrieval_agent, num_runs=num_runs, timeout_seconds=timeout, repo_path=repo)
+        eval_results = engine.run_evaluation()
         
         # Calculate metrics
         calculator = MetricsCalculator()
@@ -288,8 +298,8 @@ def compare(
             retrieval_agent = _load_agent(agent_name, repo)
             
             # Run evaluation
-            engine = EvaluationEngine(gold_set_obj, retrieval_agent)
-            eval_results = engine.run_evaluation(num_runs=num_runs)
+            engine = EvaluationEngine(gold_set_obj, retrieval_agent, num_runs=num_runs, repo_path=repo)
+            eval_results = engine.run_evaluation()
             
             # Calculate metrics
             calculator = MetricsCalculator()

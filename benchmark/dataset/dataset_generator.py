@@ -16,16 +16,18 @@ from benchmark.dataset.query_transformer import QueryTransformer
 class DatasetGenerator:
     """Orchestrates the generation of benchmark datasets from Git repositories."""
     
-    def __init__(self, repo_path: str, config: FilterConfig):
+    def __init__(self, repo_path: str, config: FilterConfig, max_commits: int = None):
         """
         Initialize the DatasetGenerator.
         
         Args:
             repo_path: Path to the Git repository
             config: FilterConfig with exclusion patterns and file count limits
+            max_commits: Maximum number of commits to analyze (None for all)
         """
         self.repo_path = repo_path
         self.config = config
+        self.max_commits = max_commits
         
         # Initialize components
         self.analyzer = CommitAnalyzer()
@@ -49,8 +51,11 @@ class DatasetGenerator:
         Returns:
             GoldSet containing all generated test cases and metadata
         """
-        # Get all commits from the repository
-        all_commits = list(self.repo.iter_commits())
+        # Get commits from the repository (limited if max_commits is set)
+        if self.max_commits:
+            all_commits = list(self.repo.iter_commits(max_count=self.max_commits))
+        else:
+            all_commits = list(self.repo.iter_commits())
         total_commits = len(all_commits)
         
         # Filter commits based on configuration
